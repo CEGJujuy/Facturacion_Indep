@@ -1,6 +1,4 @@
-import React, { useState } from 'react';
-import { useEffect } from 'react';
-import { useAuth } from '../contexts/AuthContext';
+import React, { useState, useEffect } from 'react';
 import { localDB } from '../lib/localStorage';
 import { Building2, Save, Upload } from 'lucide-react';
 
