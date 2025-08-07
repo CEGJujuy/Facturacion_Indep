@@ -5,6 +5,9 @@ export interface User {
   company_address?: string;
   company_phone?: string;
   company_email?: string;
+  company_address?: string;
+  company_phone?: string;
+  company_email?: string;
   logo_url?: string;
   created_at: string;
 }
@@ -56,6 +59,7 @@ export interface Quote {
   user_id: string;
   customer_id: string;
   customer_name: string;
+  customer_name: string;
   quote_number: string;
   status: 'draft' | 'sent' | 'accepted' | 'rejected';
   items: QuoteItem[];
@@ -63,6 +67,25 @@ export interface Quote {
   tax_amount: number;
   total: number;
   valid_until: string;
+  payment_terms?: string;
+  notes?: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface Invoice {
+  id: string;
+  user_id: string;
+  customer_id: string;
+  customer_name: string;
+  quote_id?: string;
+  invoice_number: string;
+  status: 'draft' | 'sent' | 'paid' | 'overdue';
+  items: QuoteItem[];
+  subtotal: number;
+  tax_amount: number;
+  total: number;
+  due_date: string;
   payment_terms?: string;
   notes?: string;
   created_at: string;
@@ -311,6 +334,85 @@ class LocalStorageManager {
     const year = new Date().getFullYear();
     const count = quotes.filter(q => q.quote_number.startsWith(`Q${year}`)).length + 1;
     return `Q${year}-${count.toString().padStart(4, '0')}`;
+  }
+
+  // Invoices
+  getInvoices(userId: string): Invoice[] {
+    return this.getData<Invoice>('invoices').filter(i => i.user_id === userId);
+  }
+
+  createInvoice(userId: string, invoiceData: Omit<Invoice, 'id' | 'user_id' | 'created_at' | 'updated_at'>): Invoice {
+    const invoice: Invoice = {
+      ...invoiceData,
+      id: this.generateId(),
+      user_id: userId,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    };
+    
+    const invoices = this.getData<Invoice>('invoices');
+    invoices.push(invoice);
+    this.setData('invoices', invoices);
+    
+    return invoice;
+  }
+
+  updateInvoice(id: string, updates: Partial<Invoice>): Invoice | null {
+    const invoices = this.getData<Invoice>('invoices');
+    const index = invoices.findIndex(i => i.id === id);
+    
+    if (index === -1) return null;
+    
+    invoices[index] = { 
+      ...invoices[index], 
+      ...updates, 
+      updated_at: new Date().toISOString() 
+    };
+    this.setData('invoices', invoices);
+    
+    return invoices[index];
+  }
+
+  deleteInvoice(id: string): boolean {
+    const invoices = this.getData<Invoice>('invoices');
+    const filteredInvoices = invoices.filter(i => i.id !== id);
+    
+    if (filteredInvoices.length === invoices.length) return false;
+    
+    this.setData('invoices', filteredInvoices);
+    return true;
+  }
+
+  generateInvoiceNumber(): string {
+    const invoices = this.getData<Invoice>('invoices');
+    const year = new Date().getFullYear();
+    const count = invoices.filter(i => i.invoice_number.startsWith(`INV${year}`)).length + 1;
+    return `INV${year}-${count.toString().padStart(4, '0')}`;
+  }
+
+  // Convert quote to invoice
+  convertQuoteToInvoice(quoteId: string): Invoice | null {
+    const quotes = this.getData<Quote>('quotes');
+    const quote = quotes.find(q => q.id === quoteId);
+    
+    if (!quote || quote.status !== 'accepted') return null;
+    
+    const invoiceData = {
+      customer_id: quote.customer_id,
+      customer_name: quote.customer_name,
+      quote_id: quote.id,
+      invoice_number: this.generateInvoiceNumber(),
+      status: 'draft' as const,
+      items: quote.items,
+      subtotal: quote.subtotal,
+      tax_amount: quote.tax_amount,
+      total: quote.total,
+      due_date: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // 30 days from now
+      payment_terms: quote.payment_terms,
+      notes: quote.notes
+    };
+    
+    return this.createInvoice(quote.user_id, invoiceData);
   }
 }
 
