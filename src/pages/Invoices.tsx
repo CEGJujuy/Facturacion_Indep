@@ -19,7 +19,7 @@ import { format } from 'date-fns';
 import PDFGenerator from '../components/PDFGenerator';
 
 export default function Invoices() {
-  const { user } = useAuth();
+  const [user, setUser] = useState<any>(null);
   const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [quotes, setQuotes] = useState<Quote[]>([]);
   const [customers, setCustomers] = useState<Customer[]>([]);
@@ -29,6 +29,9 @@ export default function Invoices() {
   const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null);
 
   useEffect(() => {
+    const currentUser = localDB.getCurrentUser();
+    setUser(currentUser);
+    
     if (user) {
       loadData();
     }

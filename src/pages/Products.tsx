@@ -5,14 +5,12 @@ import { Plus, Package, Wrench, Edit2, Trash2, Search } from 'lucide-react';
 export default function Products() {
   const [products, setProducts] = useState<Product[]>([]);
   const [services, setServices] = useState<Service[]>([]);
+  const [user, setUser] = useState<any>(null);
   const [activeTab, setActiveTab] = useState<'products' | 'services'>('products');
   const [showModal, setShowModal] = useState(false);
   const [editingItem, setEditingItem] = useState<Product | Service | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(true);
-
-  // Mock user ID for demo
-  const mockUserId = 'demo-user-123';
 
   // Form states
   const [formData, setFormData] = useState({
@@ -24,12 +22,17 @@ export default function Products() {
   });
 
   useEffect(() => {
+    const currentUser = localDB.getCurrentUser();
+    setUser(currentUser);
     loadData();
   }, []);
 
   const loadData = () => {
-    const userProducts = localDB.getProducts(mockUserId);
-    const userServices = localDB.getServices(mockUserId);
+    const currentUser = localDB.getCurrentUser();
+    if (!currentUser) return;
+    
+    const userProducts = localDB.getProducts(currentUser.id);
+    const userServices = localDB.getServices(currentUser.id);
     
     setProducts(userProducts);
     setServices(userServices);
@@ -49,6 +52,8 @@ export default function Products() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!user) return;
 
     try {
       if (activeTab === 'products') {
@@ -62,7 +67,7 @@ export default function Products() {
         if (editingItem) {
           localDB.updateProduct(editingItem.id, productData);
         } else {
-          localDB.createProduct(mockUserId, productData);
+          localDB.createProduct(user.id, productData);
         }
       } else {
         const serviceData = {
@@ -75,7 +80,7 @@ export default function Products() {
         if (editingItem) {
           localDB.updateService(editingItem.id, serviceData);
         } else {
-          localDB.createService(mockUserId, serviceData);
+          localDB.createService(user.id, serviceData);
         }
       }
 

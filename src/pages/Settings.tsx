@@ -3,7 +3,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { Building2, Save, Upload } from 'lucide-react';
 
 export default function Settings() {
-  const { user, updateProfile } = useAuth();
+  const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
   
@@ -15,14 +15,32 @@ export default function Settings() {
     logo_url: user?.logo_url || ''
   });
 
+  useEffect(() => {
+    const currentUser = localDB.getCurrentUser();
+    setUser(currentUser);
+    
+    if (currentUser) {
+      setFormData({
+        company_name: currentUser.company_name || '',
+        company_address: currentUser.company_address || '',
+        company_phone: currentUser.company_phone || '',
+        company_email: currentUser.company_email || '',
+        logo_url: currentUser.logo_url || ''
+      });
+    }
+  }, []);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setMessage('');
+    
+    if (!user) return;
 
     try {
-      const success = await updateProfile(formData);
-      if (success) {
+      const updatedUser = localDB.updateUser(user.id, formData);
+      if (updatedUser) {
+        setUser(updatedUser);
         setMessage('Settings updated successfully!');
       } else {
         setMessage('Failed to update settings. Please try again.');

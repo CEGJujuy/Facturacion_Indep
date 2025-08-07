@@ -4,13 +4,11 @@ import { Plus, Users, Edit2, Trash2, Search, Mail, Phone, MapPin } from 'lucide-
 
 export default function Customers() {
   const [customers, setCustomers] = useState<Customer[]>([]);
+  const [user, setUser] = useState<any>(null);
   const [showModal, setShowModal] = useState(false);
   const [editingCustomer, setEditingCustomer] = useState<Customer | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(true);
-
-  // Mock user ID for demo
-  const mockUserId = 'demo-user-123';
 
   // Form state
   const [formData, setFormData] = useState({
@@ -21,11 +19,16 @@ export default function Customers() {
   });
 
   useEffect(() => {
+    const currentUser = localDB.getCurrentUser();
+    setUser(currentUser);
     loadCustomers();
   }, []);
 
   const loadCustomers = () => {
-    const userCustomers = localDB.getCustomers(mockUserId);
+    const currentUser = localDB.getCurrentUser();
+    if (!currentUser) return;
+    
+    const userCustomers = localDB.getCustomers(currentUser.id);
     setCustomers(userCustomers);
     setLoading(false);
   };
@@ -42,12 +45,14 @@ export default function Customers() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!user) return;
 
     try {
       if (editingCustomer) {
         localDB.updateCustomer(editingCustomer.id, formData);
       } else {
-        localDB.createCustomer(mockUserId, formData);
+        localDB.createCustomer(user.id, formData);
       }
 
       loadCustomers();

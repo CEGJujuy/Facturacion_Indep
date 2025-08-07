@@ -16,13 +16,17 @@ import { format, startOfMonth, endOfMonth, eachMonthOfInterval, subMonths } from
 export default function Dashboard() {
   const [quotes, setQuotes] = useState<Quote[]>([]);
   const [loading, setLoading] = useState(true);
-
-  // Mock user ID for demo
-  const mockUserId = 'demo-user-123';
+  const [user, setUser] = useState<any>(null);
 
   useEffect(() => {
-    const userQuotes = localDB.getQuotes(mockUserId);
-    setQuotes(userQuotes);
+    const currentUser = localDB.getCurrentUser();
+    setUser(currentUser);
+    
+    if (currentUser) {
+      const userQuotes = localDB.getQuotes(currentUser.id);
+      setQuotes(userQuotes);
+    }
+    
     setLoading(false);
   }, []);
 
@@ -118,7 +122,7 @@ export default function Dashboard() {
       {/* Header */}
       <div>
         <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
-        <p className="text-gray-600">Bienvenido de vuelta, Mi Empresa</p>
+        <p className="text-gray-600">Bienvenido de vuelta, {user?.company_name || 'Usuario'}</p>
       </div>
 
       {/* Stats Cards */}

@@ -19,7 +19,7 @@ import { format } from 'date-fns';
 import PDFGenerator from '../components/PDFGenerator';
 
 export default function Quotes() {
-  const { user } = useAuth();
+  const [user, setUser] = useState<any>(null);
   const [quotes, setQuotes] = useState<Quote[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
   const [services, setServices] = useState<Service[]>([]);
@@ -57,6 +57,9 @@ export default function Quotes() {
   });
 
   useEffect(() => {
+    const currentUser = localDB.getCurrentUser();
+    setUser(currentUser);
+    
     if (user) {
       loadData();
     }
