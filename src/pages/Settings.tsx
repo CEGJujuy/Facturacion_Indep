@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
+import { useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
+import { localDB } from '../lib/localStorage';
 import { Building2, Save, Upload } from 'lucide-react';
 
 export default function Settings() {
@@ -227,5 +229,3 @@ export default function Settings() {
     </div>
   );
 }
-
-export default Settings
