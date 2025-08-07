@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { useAuth } from '../contexts/AuthContext';
 import { localDB, Quote } from '../lib/localStorage';
 import { 
   TrendingUp, 
@@ -15,17 +14,17 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContaine
 import { format, startOfMonth, endOfMonth, eachMonthOfInterval, subMonths } from 'date-fns';
 
 export default function Dashboard() {
-  const { user } = useAuth();
   const [quotes, setQuotes] = useState<Quote[]>([]);
   const [loading, setLoading] = useState(true);
 
+  // Mock user ID for demo
+  const mockUserId = 'demo-user-123';
+
   useEffect(() => {
-    if (user) {
-      const userQuotes = localDB.getQuotes(user.id);
-      setQuotes(userQuotes);
-      setLoading(false);
-    }
-  }, [user]);
+    const userQuotes = localDB.getQuotes(mockUserId);
+    setQuotes(userQuotes);
+    setLoading(false);
+  }, []);
 
   if (loading) {
     return (
@@ -119,7 +118,7 @@ export default function Dashboard() {
       {/* Header */}
       <div>
         <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
-        <p className="text-gray-600">Welcome back, {user?.company_name}</p>
+        <p className="text-gray-600">Bienvenido de vuelta, Mi Empresa</p>
       </div>
 
       {/* Stats Cards */}

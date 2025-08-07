@@ -1,10 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { useAuth } from '../contexts/AuthContext';
 import { localDB, Product, Service } from '../lib/localStorage';
 import { Plus, Package, Wrench, Edit2, Trash2, Search } from 'lucide-react';
 
 export default function Products() {
-  const { user } = useAuth();
   const [products, setProducts] = useState<Product[]>([]);
   const [services, setServices] = useState<Service[]>([]);
   const [activeTab, setActiveTab] = useState<'products' | 'services'>('products');
@@ -12,6 +10,9 @@ export default function Products() {
   const [editingItem, setEditingItem] = useState<Product | Service | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(true);
+
+  // Mock user ID for demo
+  const mockUserId = 'demo-user-123';
 
   // Form states
   const [formData, setFormData] = useState({
@@ -23,16 +24,12 @@ export default function Products() {
   });
 
   useEffect(() => {
-    if (user) {
-      loadData();
-    }
-  }, [user]);
+    loadData();
+  }, []);
 
   const loadData = () => {
-    if (!user) return;
-    
-    const userProducts = localDB.getProducts(user.id);
-    const userServices = localDB.getServices(user.id);
+    const userProducts = localDB.getProducts(mockUserId);
+    const userServices = localDB.getServices(mockUserId);
     
     setProducts(userProducts);
     setServices(userServices);
@@ -52,7 +49,6 @@ export default function Products() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!user) return;
 
     try {
       if (activeTab === 'products') {
@@ -66,7 +62,7 @@ export default function Products() {
         if (editingItem) {
           localDB.updateProduct(editingItem.id, productData);
         } else {
-          localDB.createProduct(user.id, productData);
+          localDB.createProduct(mockUserId, productData);
         }
       } else {
         const serviceData = {
@@ -79,7 +75,7 @@ export default function Products() {
         if (editingItem) {
           localDB.updateService(editingItem.id, serviceData);
         } else {
-          localDB.createService(user.id, serviceData);
+          localDB.createService(mockUserId, serviceData);
         }
       }
 
@@ -140,8 +136,8 @@ export default function Products() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Products & Services</h1>
-          <p className="text-gray-600">Manage your catalog of products and services</p>
+          <h1 className="text-2xl font-bold text-gray-900">Productos y Servicios</h1>
+          <p className="text-gray-600">Gestiona tu catálogo de productos y servicios</p>
         </div>
         <button
           onClick={() => {
@@ -151,7 +147,7 @@ export default function Products() {
           className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
         >
           <Plus className="mr-2 h-4 w-4" />
-          Add {activeTab === 'products' ? 'Product' : 'Service'}
+          Agregar {activeTab === 'products' ? 'Producto' : 'Servicio'}
         </button>
       </div>
 
@@ -167,7 +163,7 @@ export default function Products() {
             }`}
           >
             <Package className="inline mr-2 h-4 w-4" />
-            Products ({products.length})
+            Productos ({products.length})
           </button>
           <button
             onClick={() => setActiveTab('services')}
@@ -178,7 +174,7 @@ export default function Products() {
             }`}
           >
             <Wrench className="inline mr-2 h-4 w-4" />
-            Services ({services.length})
+            Servicios ({services.length})
           </button>
         </nav>
       </div>
@@ -204,16 +200,16 @@ export default function Products() {
                 <thead className="bg-gray-50">
                   <tr>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Product
+                      Producto
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Price
+                      Precio
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Tax Rate
+                      Tasa de Impuesto
                     </th>
                     <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Actions
+                      Acciones
                     </th>
                   </tr>
                 </thead>
@@ -255,7 +251,7 @@ export default function Products() {
             ) : (
               <div className="p-6 text-center text-gray-500">
                 <Package className="mx-auto h-12 w-12 text-gray-400 mb-4" />
-                <p>No products found. Add your first product to get started!</p>
+                <p>No se encontraron productos. ¡Agrega tu primer producto para comenzar!</p>
               </div>
             )}
           </div>
@@ -266,16 +262,16 @@ export default function Products() {
                 <thead className="bg-gray-50">
                   <tr>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Service
+                      Servicio
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Hourly Rate
+                      Tarifa por Hora
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Tax Rate
+                      Tasa de Impuesto
                     </th>
                     <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Actions
+                      Acciones
                     </th>
                   </tr>
                 </thead>
@@ -317,7 +313,7 @@ export default function Products() {
             ) : (
               <div className="p-6 text-center text-gray-500">
                 <Wrench className="mx-auto h-12 w-12 text-gray-400 mb-4" />
-                <p>No services found. Add your first service to get started!</p>
+                <p>No se encontraron servicios. ¡Agrega tu primer servicio para comenzar!</p>
               </div>
             )}
           </div>
@@ -330,12 +326,12 @@ export default function Products() {
           <div className="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
             <div className="mt-3">
               <h3 className="text-lg font-medium text-gray-900 mb-4">
-                {editingItem ? 'Edit' : 'Add'} {activeTab === 'products' ? 'Product' : 'Service'}
+                {editingItem ? 'Editar' : 'Agregar'} {activeTab === 'products' ? 'Producto' : 'Servicio'}
               </h3>
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Name *
+                    Nombre *
                   </label>
                   <input
                     type="text"
@@ -348,7 +344,7 @@ export default function Products() {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Description
+                    Descripción
                   </label>
                   <textarea
                     value={formData.description}
@@ -361,7 +357,7 @@ export default function Products() {
                 {activeTab === 'products' ? (
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Price *
+                      Precio *
                     </label>
                     <input
                       type="number"
@@ -376,7 +372,7 @@ export default function Products() {
                 ) : (
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Hourly Rate *
+                      Tarifa por Hora *
                     </label>
                     <input
                       type="number"
@@ -392,7 +388,7 @@ export default function Products() {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Tax Rate (%) *
+                    Tasa de Impuesto (%) *
                   </label>
                   <input
                     type="number"
@@ -415,13 +411,13 @@ export default function Products() {
                     }}
                     className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-md transition-colors"
                   >
-                    Cancel
+                    Cancelar
                   </button>
                   <button
                     type="submit"
                     className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-md transition-colors"
                   >
-                    {editingItem ? 'Update' : 'Create'}
+                    {editingItem ? 'Actualizar' : 'Crear'}
                   </button>
                 </div>
               </form>

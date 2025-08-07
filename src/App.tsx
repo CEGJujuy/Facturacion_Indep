@@ -1,10 +1,6 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { AuthProvider } from './contexts/AuthContext';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Layout from './components/Layout';
-import ProtectedRoute from './components/ProtectedRoute';
-import Login from './pages/Login';
-import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
 import Quotes from './pages/Quotes';
 import Invoices from './pages/Invoices';
@@ -14,77 +10,21 @@ import Settings from './pages/Settings';
 
 function App() {
   return (
-    <AuthProvider>
-      <Router>
-        <div className="min-h-screen bg-gray-50">
+    <Router>
+      <div className="min-h-screen bg-gray-50">
+        <Layout>
           <Routes>
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
-            <Route path="/" element={<Navigate to="/dashboard" replace />} />
-            <Route
-              path="/dashboard"
-              element={
-                <ProtectedRoute>
-                  <Layout>
-                    <Dashboard />
-                  </Layout>
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/quotes"
-              element={
-                <ProtectedRoute>
-                  <Layout>
-                    <Quotes />
-                  </Layout>
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/invoices"
-              element={
-                <ProtectedRoute>
-                  <Layout>
-                    <Invoices />
-                  </Layout>
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/products"
-              element={
-                <ProtectedRoute>
-                  <Layout>
-                    <Products />
-                  </Layout>
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/customers"
-              element={
-                <ProtectedRoute>
-                  <Layout>
-                    <Customers />
-                  </Layout>
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/settings"
-              element={
-                <ProtectedRoute>
-                  <Layout>
-                    <Settings />
-                  </Layout>
-                </ProtectedRoute>
-              }
-            />
+            <Route path="/" element={<Dashboard />} />
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/quotes" element={<Quotes />} />
+            <Route path="/invoices" element={<Invoices />} />
+            <Route path="/products" element={<Products />} />
+            <Route path="/customers" element={<Customers />} />
+            <Route path="/settings" element={<Settings />} />
           </Routes>
-        </div>
-      </Router>
-    </AuthProvider>
+        </Layout>
+      </div>
+    </Router>
   );
 }
 
