@@ -30,6 +30,7 @@ export default function Layout({ children }: LayoutProps) {
   const navigation = [
     { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
     { name: 'Quotes', href: '/quotes', icon: FileText },
+    { name: 'Invoices', href: '/invoices', icon: FileText },
     { name: 'Products & Services', href: '/products', icon: Package },
     { name: 'Customers', href: '/customers', icon: Users },
     { name: 'Settings', href: '/settings', icon: Settings },

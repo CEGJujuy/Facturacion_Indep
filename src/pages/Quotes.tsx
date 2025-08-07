@@ -16,6 +16,7 @@ import {
   Eye
 } from 'lucide-react';
 import { format } from 'date-fns';
+import PDFGenerator from '../components/PDFGenerator';
 
 export default function Quotes() {
   const { user } = useAuth();
@@ -29,6 +30,7 @@ export default function Quotes() {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [loading, setLoading] = useState(true);
+  const [selectedQuote, setSelectedQuote] = useState<Quote | null>(null);
 
   // Form states
   const [quoteForm, setQuoteForm] = useState({
@@ -390,6 +392,13 @@ export default function Quotes() {
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                       <div className="flex justify-end space-x-2">
                         <button
+                          onClick={() => setSelectedQuote(quote)}
+                          className="text-green-600 hover:text-green-900"
+                          title="Generar PDF"
+                        >
+                          <Download className="h-4 w-4" />
+                        </button>
+                        <button
                           onClick={() => handleEdit(quote)}
                           className="text-blue-600 hover:text-blue-900"
                           title="Edit"
@@ -712,6 +721,32 @@ export default function Quotes() {
                   </button>
                 </div>
               </form>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* PDF Generator */}
+      {selectedQuote && user && (
+        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg">
+            <h3 className="text-lg font-semibold mb-4">Generar PDF de Cotización</h3>
+            <p className="text-gray-600 mb-4">
+              Cotización: {selectedQuote.quote_number}
+            </p>
+            <div className="flex space-x-3">
+              <PDFGenerator
+                data={selectedQuote}
+                user={user}
+                type="quote"
+                onGenerated={() => setSelectedQuote(null)}
+              />
+              <button
+                onClick={() => setSelectedQuote(null)}
+                className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200"
+              >
+                Cancelar
+              </button>
             </div>
           </div>
         </div>

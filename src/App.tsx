@@ -7,6 +7,7 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
 import Quotes from './pages/Quotes';
+import Invoices from './pages/Invoices';
 import Products from './pages/Products';
 import Customers from './pages/Customers';
 import Settings from './pages/Settings';
@@ -36,6 +37,16 @@ function App() {
                 <ProtectedRoute>
                   <Layout>
                     <Quotes />
+                  </Layout>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/invoices"
+              element={
+                <ProtectedRoute>
+                  <Layout>
+                    <Invoices />
                   </Layout>
                 </ProtectedRoute>
               }
